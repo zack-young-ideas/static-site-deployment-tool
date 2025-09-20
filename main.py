@@ -4,7 +4,7 @@ Command-line tool used to deploy a static website to AWS.
 
 import argparse
 
-from lib import commands
+from src import commands
 
 
 if __name__ == '__main__':

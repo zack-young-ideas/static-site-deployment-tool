@@ -1,6 +1,6 @@
 import pytest
 
-from lib import validators
+from src import validators
 
 
 def test_action_values():
