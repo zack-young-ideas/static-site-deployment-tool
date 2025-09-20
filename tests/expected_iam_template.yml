@@ -1,0 +1,97 @@
+Description: 'AWS CloudFormation Template: This template creates a new IAM user and grants them the permissions needed to create a static website using S3 and CloudFront.'
+Outputs:
+  AccessKey:
+    Description: AWS access key ID for static site admin user
+    Value: !Ref 'StaticSiteAdminKey'
+  SecretKey:
+    Description: AWS secret access key for static site admin user
+    Value: !GetAtt 'StaticSiteAdminKey.SecretAccessKey'
+Resources:
+  StaticSiteAdmin:
+    Properties:
+      LoginProfile:
+        Password: 'randomPassword'
+        PasswordResetRequired: true
+      UserName: static_site_admin
+    Type: AWS::IAM::User
+  StaticSiteAdminGroup:
+    Type: AWS::IAM::Group
+  StaticSiteAdminGroupPolicy:
+    Properties:
+      Groups:
+        - !Ref 'StaticSiteAdminGroup'
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:CreateBucket
+              - s3:GetBucketPolicy
+              - s3:GetBucketLocation
+              - s3:GetObject
+              - s3:ListAllMyBuckets
+              - s3:ListBucket
+              - s3:PutBucketPolicy
+              - s3:PutEncryptionConfiguration
+              - s3:PutObject
+              - s3:TagResource
+            Effect: Allow
+            Resource: '*'
+            Sid: AllowS3BucketCreationPermissions
+          - Action:
+              - acm:AddTagsToCertificate
+              - acm:DescribeCertificate
+              - acm:GetCertificate
+              - acm:ImportCertificate
+              - acm:ListCertificates
+              - acm:ListTagsForCertificate
+              - acm:RequestCertificate
+            Effect: Allow
+            Resource: '*'
+            Sid: AllowACMCertificateRequestPermissions
+          - Action:
+              - route53:ChangeResourceRecordSets
+              - route53:ChangeTagsForResource
+              - route53:GetChange
+              - route53:GetHostedZone
+              - route53:ListHostedZones
+            Effect: Allow
+            Resource: '*'
+            Sid: AllowRecordSetGroupCreationPermissions
+          - Action:
+              - cloudfront:CreateCachePolicy
+              - cloudfront:CreateDistribution
+              - cloudfront:CreateOriginAccessControl
+              - cloudfront:CreateResponseHeadersPolicy
+              - cloudfront:GetCachePolicy
+              - cloudfront:GetDistribution
+              - cloudfront:GetDistributionConfig
+              - cloudfront:GetOriginAccessControl
+              - cloudfront:GetResponseHeadersPolicyConfig
+              - cloudfront:GetResponseHeadersPolicy
+              - cloudfront:ListCachePolicies
+              - cloudfront:ListDistributions
+              - cloudfront:TagResource
+              - cloudfront:UpdateDistribution
+              - cloudfront:UpdateOriginAccessControl
+            Effect: Allow
+            Resource: '*'
+            Sid: AllowCloudFrontCachePolicyCreationPermissions
+          - Action:
+              - cloudformation:CreateStack
+              - cloudformation:DescribeStacks
+            Effect: Allow
+            Resource: '*'
+            Sid: AllowCloudFormationStackCreationPermissions
+        Version: '2012-10-17'
+      PolicyName: StaticSiteAdmin
+    Type: AWS::IAM::Policy
+  StaticSiteAdminGroupUser:
+    Properties:
+      GroupName: !Ref 'StaticSiteAdminGroup'
+      Users:
+        - !Ref 'StaticSiteAdmin'
+    Type: AWS::IAM::UserToGroupAddition
+  StaticSiteAdminKey:
+    Properties:
+      Status: Active
+      UserName: !Ref 'StaticSiteAdmin'
+    Type: AWS::IAM::AccessKey

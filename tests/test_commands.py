@@ -23,7 +23,9 @@ def test_calls_create_iam_template_if_iam_action_is_specified():
     with patch('src.commands.iam') as MockIamModule:
         commands.main(Args)
 
-        MockIamModule.create_iam_template.assert_called_once_with()
+        MockIamModule.create_iam_template.assert_called_once_with(
+            'define_iam_user.yml'
+        )
         assert MockIamModule.create_iam_template.call_count == 1
 
         Args.action = 'deploy'

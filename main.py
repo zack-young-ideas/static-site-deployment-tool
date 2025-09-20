@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Command-line tool used to deploy a static website to AWS.
 """
