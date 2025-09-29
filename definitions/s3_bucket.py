@@ -2,7 +2,7 @@
 Defines an S3 bucket that will store the static files of the website.
 """
 
-from troposphere import s3
+from troposphere import Output, Ref, s3
 
 
 class S3Bucket:

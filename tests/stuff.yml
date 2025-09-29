@@ -1,0 +1,154 @@
+Outputs:
+  S3BucketName:
+    Description: Name of the S3 bucket that holds static files
+    Value: !Ref 'StaticWebsiteBucket'
+Resources:
+  CloudFrontCachePolicy:
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 86400
+        MaxTTL: 31536000
+        MinTTL: 0
+        Name: !Sub '${AWS::StackName}-static-site-cache-policy'
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: all
+    Type: AWS::CloudFront::CachePolicy
+  CloudFrontOriginAccessControlPolicy:
+    Properties:
+      OriginAccessControlConfig:
+        Name: secure-static-site-10356393956750014706
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+    Type: AWS::CloudFront::OriginAccessControl
+  CloudFrontResponseHeadersPolicy:
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub '${AWS::StackName}-static-site-security-headers'
+        SecurityHeadersConfig:
+          ContentSecurityPolicy:
+            ContentSecurityPolicy: default-src 'none'; img-src 'self';script-src 'self'; style-src 'self';object-src 'none'
+            Override: true
+          ContentTypeOptions:
+            Override: true
+          FrameOptions:
+            FrameOption: DENY
+            Override: true
+          ReferrerPolicy:
+            Override: true
+            ReferrerPolicy: same-origin
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 63072000
+            IncludeSubdomains: true
+            Override: true
+            Preload: true
+          XSSProtection:
+            ModeBlock: true
+            Override: true
+            Protection: true
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+  StaticSiteCloudFrontDistribution:
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - example.com
+          - www.example.com
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+          - ErrorCode: 500
+            ResponseCode: 500
+            ResponsePagePath: /500.html
+        DefaultCacheBehavior:
+          CachePolicyId: !Ref 'CloudFrontCachePolicy'
+          Compress: true
+          ResponseHeadersPolicyId: !Ref 'CloudFrontResponseHeadersPolicy'
+          TargetOriginId: !Sub 'S3-${AWS::StackName}-root'
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
+        Enabled: true
+        HttpVersion: http2
+        IPV6Enabled: true
+        Origins:
+          - DomainName: !GetAtt 'StaticWebsiteBucket.DomainName'
+            Id: !Sub 'S3-${AWS::StackName}-root'
+            OriginAccessControlId: !Ref 'CloudFrontOriginAccessControlPolicy'
+            S3OriginConfig: {}
+        ViewerCertificate:
+          AcmCertificateArn: !Ref 'StaticSiteSSLCertificate'
+          MinimumProtocolVersion: TLSv1.1_2016
+          SslSupportMethod: sni-only
+    Type: AWS::CloudFront::Distribution
+  StaticSiteDomainRecordSet:
+    Properties:
+      HostedZoneName: example.com.
+      RecordSets:
+        - AliasTarget:
+            DNSName: !GetAtt 'StaticSiteCloudFrontDistribution.DomainName'
+            EvaluateTargetHealth: false
+            HostedZoneId: '1234'
+          Name: example.com
+          Type: A
+    Type: AWS::Route53::RecordSetGroup
+  StaticSiteSSLCertificate:
+    Properties:
+      DomainName: www.example.com
+      DomainValidationOptions:
+        - DomainName: www.example.com
+          HostedZoneId: '1234'
+      SubjectAlternativeNames:
+        - example.com
+      ValidationMethod: DNS
+    Type: AWS::CertificateManager::Certificate
+  StaticSiteSubDomainRecordSet:
+    Properties:
+      HostedZoneName: example.com.
+      RecordSets:
+        - AliasTarget:
+            DNSName: !GetAtt 'StaticSiteCloudFrontDistribution.DomainName'
+            EvaluateTargetHealth: false
+            HostedZoneId: '1234'
+          Name: www.example.com
+          Type: A
+    Type: AWS::Route53::RecordSetGroup
+  StaticWebsiteBucket:
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+    Type: AWS::S3::Bucket
+  StaticWebsiteBucketPolicy:
+    Properties:
+      Bucket: !Ref 'StaticWebsiteBucket'
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudfront.amazonaws.com
+            Resource: !Sub
+              - ${S3BucketArn}/*
+              - S3BucketArn: !GetAtt 'StaticWebsiteBucket.Arn'
+          - Action: s3:ListBucket
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudfront.amazonaws.com
+            Resource: !GetAtt 'StaticWebsiteBucket.Arn'
+        Version: '2012-10-17'
+    Type: AWS::S3::BucketPolicy

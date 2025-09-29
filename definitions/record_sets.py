@@ -2,7 +2,7 @@
 Defines two DNS record sets that point to the website using AWS Route53.
 """
 
-from troposphere import route53
+from troposphere import GetAtt, route53
 
 
 class RecordSets:

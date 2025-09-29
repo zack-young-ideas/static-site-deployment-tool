@@ -4,7 +4,7 @@ Defines a CloudFront distribution to serve the website's static files.
 
 import random
 
-from troposphere import cloudfront
+from troposphere import cloudfront, GetAtt, Ref, s3, Sub
 
 
 class CloudFrontDistribution:

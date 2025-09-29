@@ -16,7 +16,7 @@ class ACMCertificate:
                 DomainValidationOptions=[
                     certificatemanager.DomainValidationOption(
                         DomainName=f'www.{self.domain_name}',
-                        HostedZoneId=self._hosted_zone_id
+                        HostedZoneId=self.hosted_zone
                     ),
                 ],
                 SubjectAlternativeNames=[self.domain_name],
