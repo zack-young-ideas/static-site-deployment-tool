@@ -12,4 +12,5 @@ def main(args):
     if arguments.action == 'iam':
         iam.create_iam_template('define_iam_user.yml')
     elif arguments.action == 'deploy':
-        create.create_static_website(arguments.domain_name)
+        create_object = create.create_static_website(arguments.domain_name)
+        create_object.deploy_static_site()

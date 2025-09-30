@@ -14,9 +14,10 @@ import boto3
 from troposphere import Template
 
 import definitions
+from src import utils
 
 
-class CloudFrontDistributionStackCreator:
+class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
 
     def __init__(self, domain_name):
         self.domain_name = domain_name
@@ -32,6 +33,11 @@ class CloudFrontDistributionStackCreator:
             template=self.template,
             hosted_zone=self.hosted_zone
         )
+        self.create_stack(
+            template=self.template,
+            stack_name='static-website'
+        )
+        s3_bucket_name = self.get_s3_bucket_name()
 
     def get_hosted_zone_id(self):
         """
@@ -42,7 +48,6 @@ class CloudFrontDistributionStackCreator:
         """
         client = boto3.client('route53')
         hosted_zones = client.list_hosted_zones()
-        print(hosted_zones)
         hosted_zone_id = None
         for item in hosted_zones['HostedZones']:
             if item['Name'] in [self.domain_name, f'{self.domain_name}.']:
@@ -55,6 +60,12 @@ class CloudFrontDistributionStackCreator:
                 + f"'{self.domain_name}'"
             )
             raise Exception(error_message)
+
+    def get_s3_bucket_name(self):
+        """
+        Retrieves the name of the S3 bucket.
+        """
+        return self._get_stack_output('static-website', 'S3BucketName')
 
 
 create_static_website = CloudFrontDistributionStackCreator

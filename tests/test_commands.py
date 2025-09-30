@@ -1,6 +1,6 @@
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
-from src import commands
+from src import commands, create
 
 
 class Args:
@@ -38,8 +38,7 @@ def test_calls_create_iam_template_if_iam_action_is_specified(mock_module):
         assert MockIamModule.create_iam_template.call_count == 1
 
 
-@patch('src.commands.iam')
-def test_calls_create_static_website_if_deploy_action_is_specified(mock_iam):
+def test_calls_create_static_website_if_deploy_action_is_specified():
     with patch('src.commands.create') as MockModule:
         Args.action = 'iam'
 
@@ -54,3 +53,19 @@ def test_calls_create_static_website_if_deploy_action_is_specified(mock_iam):
         MockModule.create_static_website.assert_called_once_with(
             'example.com'
         )
+
+
+def test_calls_deploy_static_site_if_deply_action_is_specified():
+    with patch('src.commands.create') as MockModule:
+        mock_object = MagicMock(
+            spec=create.CloudFrontDistributionStackCreator
+        )
+        MockModule.create_static_website.return_value = mock_object
+
+        assert mock_object.deploy_static_site.call_count == 0
+
+        Args.action = 'deploy'
+        commands.main(Args)
+
+        assert mock_object.deploy_static_site.call_count == 1
+        mock_object.deploy_static_site.assert_called_once_with()
