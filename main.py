@@ -17,5 +17,11 @@ if __name__ == '__main__':
             'Indicate which action to perform; choices are `iam` and `deploy`'
         )
     )
+    parser.add_argument(
+        'domain',
+        nargs='?',
+        default='',
+        help='The domain name of the website'
+    )
     args = parser.parse_args()
     commands.main(args)

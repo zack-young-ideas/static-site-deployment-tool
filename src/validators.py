@@ -5,8 +5,9 @@ Defines a class used to validate command-line arguments.
 
 class Arguments:
 
-    def __init__(self, action=None):
+    def __init__(self, action=None, domain_name=None):
         self.action = action
+        self.domain_name = domain_name
 
     def validate_arguments(self):
         if not self.action:
@@ -15,3 +16,8 @@ class Arguments:
             raise Exception(
                 '`action` argument must be either `iam` or `deploy`'
             )
+        if self.action == 'deploy':
+            if not self.domain_name:
+                raise Exception(
+                    'Must provide a domain name for website deployment'
+                )
