@@ -6,12 +6,16 @@ from src import create, iam, validators
 def main(args):
     arguments = validators.Arguments(
         args.action,
+        args.domain_support,
         args.domain,
         args.source_directory
     )
     arguments.validate_arguments()
     if arguments.action == 'iam':
-        iam.create_iam_template('define_iam_user.yml')
+        iam.create_iam_template(
+            'define_iam_user.yml',
+            arguments.domain_support
+        )
     elif arguments.action == 'deploy':
         create_object = create.create_static_website(
             arguments.domain_name,

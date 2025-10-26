@@ -18,6 +18,14 @@ if __name__ == '__main__':
         )
     )
     parser.add_argument(
+        '--domain-support',
+        action='store_true',
+        help=''.join([
+            'Indicates whether the user should be able to register new ',
+            'domain names'
+        ])
+    )
+    parser.add_argument(
         'domain',
         nargs='?',
         default='',

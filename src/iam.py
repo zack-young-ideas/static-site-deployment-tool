@@ -14,7 +14,8 @@ from troposphere import GetAtt, iam, Output, Ref, Template
 
 class IAMTemplateGenerator:
 
-    def __init__(self, output_file):
+    def __init__(self, output_file, domain_support):
+        self._domain_support = domain_support
         password = self.generate_random_password()
         print(f'IAM user password is {password}')
         template = self.generate_template(password)
@@ -171,6 +172,26 @@ class IAMTemplateGenerator:
             ],
             'Resource': '*'
         }]
+        if self._domain_support:
+            statement.append({
+                'Sid': 'AllowDomainNamePermissions',
+                'Effect': 'Allow',
+                'Action': [
+                    'route53domains:CheckDomainAvailability',
+                    'route53domains:CheckDomainTransferability',
+                    'route53domains:GetDomainDetail',
+                    'route53domains:ListDomains',
+                    'route53domains:ListOperations',
+                    'route53domains:ListPrices',
+                    'route53domains:RegisterDomain',
+                    'route53domains:TransferDomain',
+                    'route53domains:RetrieveDomainAuthCode',
+                    'route53domains:UpdateDomainContact',
+                    'route53domains:UpdateDomainContactPrivacy',
+                    'route53domains:UpdateDomainNameservers',
+                ],
+                'Resource': '*'
+            })
         policy_document = {
             'Version': '2012-10-17',
             'Statement': statement
