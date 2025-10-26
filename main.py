@@ -23,5 +23,11 @@ if __name__ == '__main__':
         default='',
         help='The domain name of the website'
     )
+    parser.add_argument(
+        'source_directory',
+        nargs='?',
+        default='',
+        help='The directory that contains the website\'s static files'
+    )
     args = parser.parse_args()
     commands.main(args)
