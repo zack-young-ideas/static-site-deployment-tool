@@ -133,7 +133,7 @@ Resources:
           - Action: s3:GetObject
             Condition:
               StringEquals:
-                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${StaticSiteCloudFrontDistribution}'
             Effect: Allow
             Principal:
               Service:
@@ -144,7 +144,7 @@ Resources:
           - Action: s3:ListBucket
             Condition:
               StringEquals:
-                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${StaticSiteCloudFrontDistribution}'
             Effect: Allow
             Principal:
               Service:
