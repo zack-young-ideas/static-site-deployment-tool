@@ -35,7 +35,7 @@ class CloudFrontDistribution:
                                 'AWS:SourceArn': Sub(
                                     'arn:aws:cloudfront::${AWS::AccountId}'
                                     ':distribution/'
-                                    '${CloudFrontDistribution}'
+                                    '${' + self.names['cloudfront_distribution'] + '}'
                                 )
                             }
                         },
@@ -58,7 +58,7 @@ class CloudFrontDistribution:
                                 'AWS:SourceArn': Sub(
                                     'arn:aws:cloudfront::${AWS::AccountId}'
                                     ':distribution/'
-                                    '${CloudFrontDistribution}'
+                                    '${' + self.names['cloudfront_distribution'] + '}'
                                 )
                             }
                         },
