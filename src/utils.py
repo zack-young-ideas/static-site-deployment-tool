@@ -10,7 +10,7 @@ import boto3
 
 class CloudFormationStackCreator:
 
-    _client = boto3.client('cloudformation')
+    _client = boto3.client('cloudformation', region_name='us-east-1')
 
     def create_stack(self, template, stack_name):
         """

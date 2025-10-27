@@ -3,7 +3,7 @@ from src import iam
 
 def test_generates_random_password(tmp_path):
     file_path = tmp_path / 'output.yml'
-    instance = iam.IAMTemplateGenerator(file_path)
+    instance = iam.IAMTemplateGenerator(file_path, False)
     random_password = instance.generate_random_password()
 
     assert type(random_password) is str
@@ -17,7 +17,7 @@ def test_writes_template_file(tmp_path):
         del expected_content[12]
         expected_content = ''.join(expected_content)
     file_path = tmp_path / 'output.yml'
-    iam.IAMTemplateGenerator(file_path)
+    iam.IAMTemplateGenerator(file_path, False)
 
     assert file_path.exists()
 

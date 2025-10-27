@@ -41,7 +41,7 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
             stack_name='static-website'
         )
         s3_bucket_name = self.get_s3_bucket_name()
-        self._upload_files(s3_bucket_name)
+        self._upload_files(s3_bucket_name=s3_bucket_name)
 
     def _upload_files(self, s3_bucket_name):
         """

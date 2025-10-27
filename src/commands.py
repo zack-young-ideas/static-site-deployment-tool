@@ -6,8 +6,8 @@ from src import create, iam, validators
 def main(args):
     arguments = validators.Arguments(
         args.action,
-        args.domain_support,
         args.domain,
+        args.domain_support,
         args.source_directory
     )
     arguments.validate_arguments()

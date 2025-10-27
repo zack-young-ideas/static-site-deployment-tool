@@ -18,7 +18,11 @@ def test_action_values():
     args = validators.Arguments(action='iam')
     args.validate_arguments()
 
-    args = validators.Arguments(action='deploy', domain_name='example.com')
+    args = validators.Arguments(
+        action='deploy', 
+        domain_name='example.com',
+        source_dir='./source_dir'
+    )
     args.validate_arguments()
 
 
@@ -30,5 +34,9 @@ def test_domain_name():
     with pytest.raises(Exception):
         args.validate_arguments()
 
-    args = validators.Arguments(action='deploy', domain_name='example.com')
+    args = validators.Arguments(
+        action='deploy', 
+        domain_name='example.com',
+        source_dir='./source_dir'
+    )
     args.validate_arguments()

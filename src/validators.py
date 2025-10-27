@@ -6,9 +6,10 @@ Defines a class used to validate command-line arguments.
 class Arguments:
 
     def __init__(
-            self, action=None,(
-            domain_support=None,
+            self,
+            action=None,
             domain_name=None,
+            domain_support=None,
             source_dir=None
     ):
         self.action = action
@@ -36,6 +37,6 @@ class Arguments:
             raise Exception(
                 ''.join([
                     'Argument --domain-support is invalid when used with ',
-                    'iam command'
+                    'deploy command'
                 ])
             )
