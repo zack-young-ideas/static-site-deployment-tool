@@ -20,7 +20,7 @@ class CloudFrontDistribution:
             random_string += str(random.randint(0, 10))
         return random_string
 
-    def define_cloudfront_distribution(self):
+    def define_cloudfront_distribution(self, homepage):
         self.template.add_resource(s3.BucketPolicy(
             'StaticWebsiteBucketPolicy',
             Bucket=Ref(self.names['s3_bucket']),
@@ -180,7 +180,7 @@ class CloudFrontDistribution:
                     ViewerProtocolPolicy='redirect-to-https',
                     ResponseHeadersPolicyId=Ref(response_headers_policy)
                 ),
-                DefaultRootObject='index.html',
+                DefaultRootObject=homepage,
                 Enabled=True,
                 HttpVersion='http2',
                 IPV6Enabled=True,

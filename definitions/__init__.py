@@ -12,9 +12,10 @@ class CloudFormationTemplate(
     s3_bucket.S3Bucket
 ):
 
-    def __init__(self, domain_name, template, hosted_zone):
+    def __init__(self, domain_name, template, homepage, hosted_zone):
         self.domain_name = domain_name
         self.template = template
+        self.homepage = homepage
         # Hosted zone ID.
         self.hosted_zone = hosted_zone
 
@@ -27,4 +28,4 @@ class CloudFormationTemplate(
         self.define_ssl_certificate()
         self.define_record_sets()
         self.define_s3_bucket()
-        self.define_cloudfront_distribution()
+        self.define_cloudfront_distribution(self.homepage)

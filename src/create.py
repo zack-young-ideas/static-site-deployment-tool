@@ -21,9 +21,10 @@ from src import utils
 
 class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
 
-    def __init__(self, domain_name, source_directory):
-        self.domain_name = domain_name
-        self.source_directory = source_directory
+    def __init__(self, arguments):
+        self.domain_name = arguments.DOMAIN_NAME
+        self.homepage = arguments.INDEX_FILE
+        self.source_directory = arguments.SOURCE_FILES_DIRECTORY
         self.template = Template()
         self.hosted_zone = self.get_hosted_zone_id()
 
@@ -34,6 +35,7 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
         definitions.CloudFormationTemplate(
             domain_name=self.domain_name,
             template=self.template,
+            homepage=self.homepage,
             hosted_zone=self.hosted_zone
         )
         self.create_stack(

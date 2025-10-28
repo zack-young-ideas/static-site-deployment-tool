@@ -8,6 +8,7 @@ def test_generates_proper_template():
     definitions.CloudFormationTemplate(
         domain_name='example.com',
         template=template,
+        homepage='index.html',
         hosted_zone='1234'
     )
     actual_content = template.to_yaml().splitlines(keepends=True)

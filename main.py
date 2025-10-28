@@ -5,7 +5,7 @@ Command-line tool used to deploy a static website to AWS.
 
 import argparse
 
-from src import commands
+from src import main
 
 
 if __name__ == '__main__':
@@ -18,24 +18,9 @@ if __name__ == '__main__':
         )
     )
     parser.add_argument(
-        '--domain-support',
-        action='store_true',
-        help=''.join([
-            'Indicates whether the user should be able to register new ',
-            'domain names'
-        ])
-    )
-    parser.add_argument(
-        'domain',
-        nargs='?',
-        default='',
-        help='The domain name of the website'
-    )
-    parser.add_argument(
-        'source_directory',
-        nargs='?',
-        default='',
-        help='The directory that contains the website\'s static files'
+        '--config',
+        default='settings.py',
+        help='The location of the file containing required settings'
     )
     args = parser.parse_args()
-    commands.main(args)
+    main(args)

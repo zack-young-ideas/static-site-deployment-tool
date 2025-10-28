@@ -14,12 +14,17 @@ from troposphere import GetAtt, iam, Output, Ref, Template
 
 class IAMTemplateGenerator:
 
-    def __init__(self, output_file, domain_support):
-        self._domain_support = domain_support
+    def __init__(self, arguments):
+        self._register_domain = arguments.REGISTER_DOMAIN
+        self._filename_extension = arguments.TEMPLATE_FORMAT
         password = self.generate_random_password()
         print(f'IAM user password is {password}')
         template = self.generate_template(password)
-        with open(output_file, 'w') as the_juice:
+        if self._filename_extension == 'JSON':
+            extension = '.json'
+        else:
+            extension = '.yml'
+        with open(f'{arguments.IAM_USER_TEMPLATE}{extension}', 'w') as the_juice:
             the_juice.write(template)
 
     def generate_random_password(self):
@@ -32,7 +37,7 @@ class IAMTemplateGenerator:
 
     def generate_template(self, password):
         """
-        Returns the CloudFormation template in YAML format.
+        Returns the CloudFormation template in the specified format.
         """
         template = Template()
         template.set_description(
@@ -41,7 +46,10 @@ class IAMTemplateGenerator:
             + 'website using S3 and CloudFront.'
         )
         self.add_resources(template=template, password=password)
-        return template.to_yaml()
+        if self._filename_extension == 'JSON':
+            return template.to_json()
+        else:
+            return template.to_yaml()
 
     def add_resources(self, template, password):
         """
@@ -172,7 +180,7 @@ class IAMTemplateGenerator:
             ],
             'Resource': '*'
         }]
-        if self._domain_support:
+        if self._register_domain:
             statement.append({
                 'Sid': 'AllowDomainNamePermissions',
                 'Effect': 'Allow',
