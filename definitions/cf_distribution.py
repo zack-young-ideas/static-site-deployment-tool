@@ -198,7 +198,7 @@ class CloudFrontDistribution:
                     )
                 ],
                 ViewerCertificate=cloudfront.ViewerCertificate(
-                    AcmCertificateArn=Ref(self.names['acm_certificate']),
+                    AcmCertificateArn=f'{self.certificate_arn}',
                     MinimumProtocolVersion='TLSv1.1_2016',
                     SslSupportMethod='sni-only'
                 )

@@ -11,19 +11,21 @@ class CloudFormationTemplate(
     s3_bucket.S3Bucket
 ):
 
-    def __init__(self, domain_name, template, homepage, hosted_zone):
+    def __init__(self, domain_name, template, homepage,
+                 hosted_zone, certificate_arn):
         self.domain_name = domain_name
         self.template = template
         self.homepage = homepage
         # Hosted zone ID.
         self.hosted_zone = hosted_zone
-
+        # The ARN of the SSL certificate.
+        self.certificate_arn = certificate_arn
         # Names that are referenced by multiple template resources.
         self.names = {
-            'acm_certificate': 'StaticSiteSSLCertificate',
             'cloudfront_distribution': 'StaticSiteCloudFrontDistribution',
             's3_bucket': 'StaticWebsiteBucket',
         }
+
         self.define_record_sets()
         self.define_s3_bucket()
         self.define_cloudfront_distribution(self.homepage)

@@ -11,8 +11,11 @@ by a CloudFront distribution.
 
 import mimetypes
 import os
+import sys
+import time
 
 import boto3
+from botocore.exceptions import ClientError
 
 from troposphere import Template
 
@@ -33,11 +36,16 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
         """
         Runs all the commands needed to create the site.
         """
+        certificate_arn = self._create_certificate()
+        validation_records = self._retrieve_validation_records(certificate_arn)
+        self._create_CNAME_records(validation_records)
+        self._check_certificate_status(certificate_arn)
         definitions.CloudFormationTemplate(
             domain_name=self.domain_name,
             template=self.template,
             homepage=self.homepage,
-            hosted_zone=self.hosted_zone
+            hosted_zone=self.hosted_zone,
+            certificate_arn=certificate_arn
         )
         self.create_stack(
             template=self.template,
@@ -45,6 +53,114 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
         )
         s3_bucket_name = self.get_s3_bucket_name()
         self._upload_files(s3_bucket_name=s3_bucket_name)
+
+    def _create_certificate(self):
+        """
+        Creates an SSL certificate using AWS Certificate Manager.
+        """
+        client = boto3.client('acm')
+        try:
+            response = client.request_certificate(
+                DomainName=self.domain_name,
+                SubjectAlternativeNames=[f'www.{self.domain_name}'],
+                ValidationMethod='DNS'
+            )
+            certificate_arn = response['CertificateArn']
+        except ClientError as err:
+            print(f'Error requesting certificate: {err}')
+            sys.exit(1)
+        else:
+            return certificate_arn
+
+    def _retrieve_validation_records(self, certificate_arn):
+        """
+        Retrieves the certificate's validation records.
+        """
+        client = boto3.client('acm')
+        validation_records = None
+        max_retries = 10
+        retries = 0
+        while retries < max_retries:
+            try:
+                response = client.describe_certificate(
+                    CertificateArn=certificate_arn
+                )
+                validation_options = (
+                    describe_response['Certificate']['DomainValidationOptions']
+                )
+                if (validation_options and
+                    ('ResourceRecord' in validation_options[0])):
+                    validation_records = [dvo['ResourceRecord'] for
+                                          dvo in validation_options]
+                    break
+            except ClientError as err:
+                pass
+            print(''.join([
+                'Validation records not available yet. Waiting 10 seconds. ',
+                f'Retry {retries + 1}/{max_retries}'
+            ]))
+            time.sleep(10)
+            retries += 1
+        if not validation_records:
+            print('Timed out waiting for validation records.')
+            sys.exit(1)
+        else:
+            return validation_records
+
+    def _create_CNAME_records(self, validation_records):
+        """
+        Creates CNAME records to validate SSL certificate.
+        """
+        client = boto3.client('route53')
+        try:
+            route53_changes = []
+            for record in validation_records:
+                route53_changes.append({
+                    'Action': 'UPSERT',
+                    'ResourceRecordSet': {
+                        'Name': record['Name'],
+                        'Type': record['Type'],
+                        'TTL': 300,
+                        'ResourceRecords': [{
+                            'Value': record['Value'],
+                        }],
+                    },
+                })
+            client.change_resource_record_sets(
+                HostedZoneId=self.hosted_zone,
+                ChangeBatch={
+                    'Comment': (
+                        f'Adding DNS validation records for SSL certificate'
+                    ),
+                    'Changes': route53_changes,
+                },
+            )
+        except ClientError as err:
+            print(f'Error creating Route53 record set: {err}')
+            sys.exit(1)
+
+    def _check_certificate_status(self, certificate_arn):
+        client = boto3.client('acm')
+        print('Certificate is pending validation...')
+        while True:
+            response = client.describe_certificate(
+                CertificateArn=certificate_arn
+            )
+            status = response['Certificate']['Status']
+
+            if status == 'ISSUED':
+                print(''.join([
+                    f'Certificate {certificate_arn} has been successfully ',
+                    'validated and issued!'
+                ]))
+                return
+            if status == 'FAILED':
+                print(''.join([
+                    'Certificate validation failed. Reason: ',
+                    f"{response['Certificate']['FailureReason']}"
+                ]))
+                sys.exit(1)
+            time.sleep(30)
 
     def _upload_files(self, s3_bucket_name):
         """
