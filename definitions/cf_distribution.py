@@ -32,11 +32,13 @@ class CloudFrontDistribution:
                         'Action': 's3:GetObject',
                         'Condition': {
                             'StringEquals': {
-                                'AWS:SourceArn': Sub(
-                                    'arn:aws:cloudfront::${AWS::AccountId}'
-                                    ':distribution/'
-                                    '${' + self.names['cloudfront_distribution'] + '}'
-                                )
+                                'AWS:SourceArn': Sub(''.join([
+                                    'arn:aws:cloudfront::${AWS::AccountId}',
+                                    ':distribution/',
+                                    '${',
+                                    self.names['cloudfront_distribution'],
+                                    '}',
+                                ]))
                             }
                         },
                         'Principal': {
@@ -55,11 +57,13 @@ class CloudFrontDistribution:
                         'Action': 's3:ListBucket',
                         'Condition': {
                             'StringEquals': {
-                                'AWS:SourceArn': Sub(
-                                    'arn:aws:cloudfront::${AWS::AccountId}'
-                                    ':distribution/'
-                                    '${' + self.names['cloudfront_distribution'] + '}'
-                                )
+                                'AWS:SourceArn': Sub(''.join([
+                                    'arn:aws:cloudfront::${AWS::AccountId}',
+                                    ':distribution/',
+                                    '${',
+                                    self.names['cloudfront_distribution'],
+                                    '}',
+                                ]))
                             }
                         },
                         'Principal': {

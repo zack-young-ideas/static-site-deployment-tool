@@ -19,7 +19,7 @@ class RecordSets:
                             'DomainName'
                         ),
                         EvaluateTargetHealth=False,
-                        HostedZoneId=self.hosted_zone
+                        HostedZoneId='Z2FDTNDATAQYW2'
                     ),
                     Name=self.domain_name,
                     Type='A'
@@ -37,7 +37,7 @@ class RecordSets:
                             'DomainName'
                         ),
                         EvaluateTargetHealth=False,
-                        HostedZoneId=self.hosted_zone
+                        HostedZoneId='Z2FDTNDATAQYW2'
                     ),
                     Name=f'www.{self.domain_name}',
                     Type='A'
