@@ -42,7 +42,7 @@ class String(Validator):
 
     def validate(self, value):
         # Value must be a string.
-        if type(value) != str:
+        if type(value) is not str:
             raise TypeError(f'{self.public_name} must be a valid string')
 
         # If no allowed strings are specified, then any string is valid.
@@ -75,8 +75,12 @@ class Arguments:
     SOURCE_FILES_DIRECTORY = String()
     DOMAIN_NAME = String()
     INDEX_FILE = String(default_value='index.html')
-    _404_FILE = String(default_value=os.path.join(BASE_DIR, 'html', '404.html'))
-    _500_FILE = String(default_value=os.path.join(BASE_DIR, 'html', '500.html'))
+    _404_FILE = String(
+        default_value=os.path.join(BASE_DIR, 'html', '404.html')
+    )
+    _500_FILE = String(
+        default_value=os.path.join(BASE_DIR, 'html', '500.html')
+    )
     REGISTER_DOMAIN = Boolean(default_value=True)
     HTML_EXTENSIONS = Boolean(default_value=True)
 
@@ -99,7 +103,9 @@ class Arguments:
 
         # Ensure that settings_file exists.
         if not os.path.isfile(self.settings_file):
-            raise FileNotFoundError(f'File {self.settings_file} does not exist')
+            raise FileNotFoundError(
+                f'File {self.settings_file} does not exist'
+            )
 
         # Ensure that the settings defined in settings_file are valid.
         module_name = os.path.splitext(self.settings_file)[0]

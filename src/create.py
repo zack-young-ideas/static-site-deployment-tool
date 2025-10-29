@@ -86,14 +86,14 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
                     CertificateArn=certificate_arn
                 )
                 validation_options = (
-                    describe_response['Certificate']['DomainValidationOptions']
+                    response['Certificate']['DomainValidationOptions']
                 )
                 if (validation_options and
-                    ('ResourceRecord' in validation_options[0])):
+                        ('ResourceRecord' in validation_options[0])):
                     validation_records = [dvo['ResourceRecord'] for
                                           dvo in validation_options]
                     break
-            except ClientError as err:
+            except ClientError:
                 pass
             print(''.join([
                 'Validation records not available yet. Waiting 10 seconds. ',
@@ -130,7 +130,7 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
                 HostedZoneId=self.hosted_zone,
                 ChangeBatch={
                     'Comment': (
-                        f'Adding DNS validation records for SSL certificate'
+                        'Adding DNS validation records for SSL certificate'
                     ),
                     'Changes': route53_changes,
                 },
