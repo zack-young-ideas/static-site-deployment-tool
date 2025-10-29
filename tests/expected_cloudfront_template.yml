@@ -97,16 +97,6 @@ Resources:
           Name: example.com
           Type: A
     Type: AWS::Route53::RecordSetGroup
-  StaticSiteSSLCertificate:
-    Properties:
-      DomainName: www.example.com
-      DomainValidationOptions:
-        - DomainName: www.example.com
-          HostedZoneId: '1234'
-      SubjectAlternativeNames:
-        - example.com
-      ValidationMethod: DNS
-    Type: AWS::CertificateManager::Certificate
   StaticSiteSubDomainRecordSet:
     Properties:
       HostedZoneName: example.com.

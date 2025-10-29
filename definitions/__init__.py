@@ -2,11 +2,10 @@
 Defines a class that represents the CloudFormation template.
 """
 
-from . import certificate, cf_distribution, record_sets, s3_bucket
+from . import cf_distribution, record_sets, s3_bucket
 
 
 class CloudFormationTemplate(
-    certificate.ACMCertificate,
     cf_distribution.CloudFrontDistribution,
     record_sets.RecordSets,
     s3_bucket.S3Bucket
@@ -25,7 +24,6 @@ class CloudFormationTemplate(
             'cloudfront_distribution': 'StaticSiteCloudFrontDistribution',
             's3_bucket': 'StaticWebsiteBucket',
         }
-        self.define_ssl_certificate()
         self.define_record_sets()
         self.define_s3_bucket()
         self.define_cloudfront_distribution(self.homepage)
