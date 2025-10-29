@@ -24,7 +24,8 @@ class IAMTemplateGenerator:
             extension = '.json'
         else:
             extension = '.yml'
-        with open(f'{arguments.IAM_USER_TEMPLATE}{extension}', 'w') as the_juice:
+        filename = f'{arguments.IAM_USER_TEMPLATE}{extension}'
+        with open(filename, 'w') as the_juice:
             the_juice.write(template)
 
     def generate_random_password(self):
@@ -148,6 +149,7 @@ class IAMTemplateGenerator:
                 'route53:GetChange',
                 'route53:GetHostedZone',
                 'route53:ListHostedZones',
+                'route53:ListResourceRecordSets',
             ],
             'Resource': '*'
         }, {
