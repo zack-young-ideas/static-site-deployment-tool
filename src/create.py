@@ -9,6 +9,7 @@ and upload static files to an S3 bucket so that the site will be served
 by a CloudFront distribution.
 """
 
+import mimetypes
 import os
 
 import boto3
@@ -52,25 +53,29 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
         client = boto3.client('s3')
         for root, directory, files in os.walk(self.source_directory):
             for file in files:
-                filename_prefix = root.split(os.sep)[3:]
-                if filename_prefix:
-                    fully_qualified_filename = os.path.join(
-                        os.path.join(*filename_prefix),
-                        file
+                # Determine the location of the file on the local disk.
+                local_filepath = os.path.join(root, file)
+
+                # Determine the URL the file should have.
+                parent_dir = root.split(self.source_directory)[-1:][0]
+                if parent_dir:
+                    file_url = (
+                        '/'.join(parent_dir.split(os.sep)).lstrip('/')
+                        + '/'
+                        + file
                     )
                 else:
-                    fully_qualified_filename = file
-                extension = os.path.splitext(file)[1]
-                content_type = 'text/html'
-                if extension == '.js':
-                    content_type = 'text/javascript'
-                if extension == '.css':
-                    content_type = 'text/css'
+                    file_url = file
+
+                # Determine the MIME type of each file.
+                mime_type, _ = mimetypes.guess_type(file)
+
+                # Upload the file to the S3 bucket.
                 client.upload_file(
-                    os.path.join(root, file),
+                    local_filepath,
                     s3_bucket_name,
-                    fully_qualified_filename,
-                    {'ContentType': content_type}
+                    file_url,
+                    {'ContentType': mime_type}
                 )
 
     def get_hosted_zone_id(self):
