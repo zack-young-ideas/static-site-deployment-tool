@@ -82,7 +82,7 @@ Resources:
             OriginAccessControlId: !Ref 'CloudFrontOriginAccessControlPolicy'
             S3OriginConfig: {}
         ViewerCertificate:
-          AcmCertificateArn: !Ref 'StaticSiteSSLCertificate'
+          AcmCertificateArn: arn:aws:acm:us-east-1:1234:certificate/5678
           MinimumProtocolVersion: TLSv1.1_2016
           SslSupportMethod: sni-only
     Type: AWS::CloudFront::Distribution
@@ -93,7 +93,7 @@ Resources:
         - AliasTarget:
             DNSName: !GetAtt 'StaticSiteCloudFrontDistribution.DomainName'
             EvaluateTargetHealth: false
-            HostedZoneId: '1234'
+            HostedZoneId: Z2FDTNDATAQYW2
           Name: example.com
           Type: A
     Type: AWS::Route53::RecordSetGroup
@@ -104,7 +104,7 @@ Resources:
         - AliasTarget:
             DNSName: !GetAtt 'StaticSiteCloudFrontDistribution.DomainName'
             EvaluateTargetHealth: false
-            HostedZoneId: '1234'
+            HostedZoneId: Z2FDTNDATAQYW2
           Name: www.example.com
           Type: A
     Type: AWS::Route53::RecordSetGroup

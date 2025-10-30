@@ -9,7 +9,8 @@ def test_generates_proper_template():
         domain_name='example.com',
         template=template,
         homepage='index.html',
-        hosted_zone='1234'
+        hosted_zone='1234',
+        certificate_arn='arn:aws:acm:us-east-1:1234:certificate/5678'
     )
     actual_content = template.to_yaml().splitlines(keepends=True)
     # Must delete line that contains random string.

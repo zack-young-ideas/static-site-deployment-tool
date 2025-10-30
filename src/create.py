@@ -58,6 +58,7 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
         """
         Creates an SSL certificate using AWS Certificate Manager.
         """
+        print('Creating SSL certificate...')
         client = boto3.client('acm')
         try:
             response = client.request_certificate(
@@ -166,6 +167,7 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
         """
         Uploads the static site files to the S3 bucket.
         """
+        print('Uploading static files to S3 bucket...')
         client = boto3.client('s3')
         for root, directory, files in os.walk(self.source_directory):
             for file in files:
@@ -193,6 +195,7 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
                     file_url,
                     {'ContentType': mime_type}
                 )
+        print('Finished')
 
     def get_hosted_zone_id(self):
         """

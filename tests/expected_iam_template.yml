@@ -53,6 +53,7 @@ Resources:
               - route53:GetChange
               - route53:GetHostedZone
               - route53:ListHostedZones
+              - route53:ListResourceRecordSets
             Effect: Allow
             Resource: '*'
             Sid: AllowRecordSetGroupCreationPermissions

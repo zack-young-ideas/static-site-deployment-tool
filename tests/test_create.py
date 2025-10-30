@@ -18,6 +18,27 @@ hosted_zones = {
 }
 
 
+# Return value of boto3.client('acm').describe_certificate().
+certificate_details = {
+    'Certificate': {
+        'DomainValidationOptions': [{
+            'ResourceRecord': {
+                'Name': '_randomString',
+                'Type': 'CNAME',
+                'Value': '_moreRandomness',
+            }
+        }, {
+            'ResourceRecord': {
+                'Name': '_yetAnotherRandomString',
+                'Type': 'CNAME',
+                'Value': '_evenMoreRandomness',
+            }
+        }],
+        'Status': 'ISSUED',
+    }
+}
+
+
 class MockArguments:
     """
     Mocks the Arguments object passed to
@@ -31,14 +52,21 @@ class MockArguments:
 @pytest.fixture(autouse=True)
 def mock_boto3_client(mocker):
     mock_boto3_client = mocker.patch('src.create.boto3.client')
+    mock_acm = mocker.Mock()
+    mock_acm.request_certificate.return_value = {
+        'CertificateArn': 'arn:aws:acm:us-east-1:1234:certificate/5678'
+    }
+    mock_acm.describe_certificate.return_value = certificate_details
     mock_route53 = mocker.Mock()
     mock_route53.list_hosted_zones.return_value = hosted_zones
     mock_s3 = mocker.Mock()
     mock_boto3_client.side_effect = lambda service: {
+        'acm': mock_acm,
         'route53': mock_route53,
         's3': mock_s3
     }[service]
     return {
+        'acm': mock_acm,
         'client': mock_boto3_client,
         'route53': mock_route53,
         's3': mock_s3
