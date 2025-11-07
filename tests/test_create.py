@@ -47,6 +47,8 @@ class MockArguments:
     DOMAIN_NAME = 'example.com'
     INDEX_FILE = 'index.html'
     SOURCE_FILES_DIRECTORY = 'source_dir'
+    _404_FILE = None
+    _500_FILE = None
 
 
 @pytest.fixture(autouse=True)
