@@ -11,6 +11,7 @@ by a CloudFront distribution.
 
 import mimetypes
 import os
+from pathlib import Path
 import sys
 import time
 
@@ -23,11 +24,18 @@ import definitions
 from src import utils
 
 
+# Used to determine the locations of files relative to the project
+# root directory.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
 class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
 
     def __init__(self, arguments):
         self.domain_name = arguments.DOMAIN_NAME
         self.homepage = arguments.INDEX_FILE
+        self._404_file = arguments._404_FILE
+        self._500_file = arguments._500_FILE
         self.source_directory = arguments.SOURCE_FILES_DIRECTORY
         self.template = Template()
         self.hosted_zone = self.get_hosted_zone_id()
@@ -195,6 +203,24 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
                     file_url,
                     {'ContentType': mime_type}
                 )
+
+        # If no 404 file is specified, use the default.
+        if self._404_file is None:
+            client.upload_file(
+                os.path.join(BASE_DIR, 'html', '404.html'),
+                s3_bucket_name,
+                '404.html',
+                {'ContentType': 'text/html'}
+            )
+
+        # If no 500 file is specified, use the default.
+        if self._500_file is None:
+            client.upload_file(
+                os.path.join(BASE_DIR, 'html', '500.html'),
+                s3_bucket_name,
+                '500.html',
+                {'ContentType': 'text/html'}
+            )
         print('Finished')
 
     def get_hosted_zone_id(self):
