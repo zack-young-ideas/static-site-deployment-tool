@@ -12,10 +12,12 @@ class CloudFormationTemplate(
 ):
 
     def __init__(self, domain_name, template, homepage,
-                 hosted_zone, certificate_arn):
+                 _404_page, _500_page, hosted_zone, certificate_arn):
         self.domain_name = domain_name
         self.template = template
         self.homepage = homepage
+        self._404_page = _404_page
+        self._500_page = _500_page
         # Hosted zone ID.
         self.hosted_zone = hosted_zone
         # The ARN of the SSL certificate.
@@ -28,4 +30,8 @@ class CloudFormationTemplate(
 
         self.define_record_sets()
         self.define_s3_bucket()
-        self.define_cloudfront_distribution(self.homepage)
+        self.define_cloudfront_distribution(
+            self.homepage,
+            self._404_page,
+            self._500_page
+        )

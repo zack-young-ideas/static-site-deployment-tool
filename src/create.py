@@ -52,6 +52,8 @@ class CloudFrontDistributionStackCreator(utils.CloudFormationStackCreator):
             domain_name=self.domain_name,
             template=self.template,
             homepage=self.homepage,
+            _404_page=(self._404_file or '404.html'),
+            _500_page=(self._500_file or '500.html'),
             hosted_zone=self.hosted_zone,
             certificate_arn=certificate_arn
         )

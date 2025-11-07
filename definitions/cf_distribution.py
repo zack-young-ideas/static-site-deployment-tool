@@ -20,7 +20,7 @@ class CloudFrontDistribution:
             random_string += str(random.randint(0, 10))
         return random_string
 
-    def define_cloudfront_distribution(self, homepage):
+    def define_cloudfront_distribution(self, homepage, _404_page, _500_page):
         self.template.add_resource(s3.BucketPolicy(
             'StaticWebsiteBucketPolicy',
             Bucket=Ref(self.names['s3_bucket']),
@@ -169,12 +169,12 @@ class CloudFrontDistribution:
                     cloudfront.CustomErrorResponse(
                         ErrorCode=404,
                         ResponseCode=404,
-                        ResponsePagePath='/404.html'
+                        ResponsePagePath=f'/{_404_page}'
                     ),
                     cloudfront.CustomErrorResponse(
                         ErrorCode=500,
                         ResponseCode=500,
-                        ResponsePagePath='/500.html'
+                        ResponsePagePath=f'/{_500_page}'
                     ),
                 ],
                 DefaultCacheBehavior=cloudfront.DefaultCacheBehavior(

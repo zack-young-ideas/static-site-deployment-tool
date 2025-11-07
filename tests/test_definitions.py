@@ -9,6 +9,8 @@ def test_generates_proper_template():
         domain_name='example.com',
         template=template,
         homepage='index.html',
+        _404_page='404.html',
+        _500_page='500.html',
         hosted_zone='1234',
         certificate_arn='arn:aws:acm:us-east-1:1234:certificate/5678'
     )

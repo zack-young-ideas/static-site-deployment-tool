@@ -93,6 +93,29 @@ def test_can_retrieve_hosted_zone_id(mock_boto3_client, mock_instance):
     assert mock_instance['instance'].get_hosted_zone_id() == '1234'
 
 
+def test_deploy_static_site_method_creates_CloudFormationTemplate_object(
+    mock_boto3_client,
+    mock_instance,
+    mocker
+):
+    mock_class = mocker.patch('definitions.CloudFormationTemplate')
+
+    assert mock_class.call_count == 0
+
+    mock_instance['instance'].deploy_static_site()
+
+    assert mock_class.call_count == 1
+    mock_class.assert_called_once_with(
+        domain_name='example.com',
+        template=mock_instance['instance'].template,
+        homepage='index.html',
+        _404_page='404.html',
+        _500_page='500.html',
+        hosted_zone='1234',
+        certificate_arn='arn:aws:acm:us-east-1:1234:certificate/5678'
+    )
+
+
 def test_deploy_static_site_method_calls_create_stack_method(
     mock_boto3_client,
     mock_instance
