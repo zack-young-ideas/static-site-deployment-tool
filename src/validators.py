@@ -125,13 +125,19 @@ class Arguments:
                         ])
                     )
 
+            # Ensure the source directory exists.
+            if not os.path.isdir(self.SOURCE_FILES_DIRECTORY):
+                raise ValueError(
+                    f'Directory {self.SOURCE_FILES_DIRECTORY} cannot be found'
+                )
+
             # Ensure the index.html file exists.
             index_file_path = os.path.join(
                 self.SOURCE_FILES_DIRECTORY,
                 self.INDEX_FILE
             )
             if not os.path.isfile(index_file_path):
-                raise ValueError(f' File {index_file_path} cannot be found')
+                raise ValueError(f'File {index_file_path} cannot be found')
 
             # Ensure the 404.html file exists, if specified.
             if self._404_FILE:
@@ -140,7 +146,7 @@ class Arguments:
                     self._404_FILE
                 )
                 if not os.path.isfile(_404_file_path):
-                     raise ValueError(f' File {_404_file_path} cannot be found')
+                     raise ValueError(f'File {_404_file_path} cannot be found')
 
             # Ensure the 500.html file exists, if specified.
             if self._500_FILE:
@@ -149,4 +155,4 @@ class Arguments:
                     self._500_FILE
                 )
                 if not os.path.isfile(_500_file_path):
-                    raise ValueError(f' File {_500_file_path} cannot be found')
+                    raise ValueError(f'File {_500_file_path} cannot be found')
