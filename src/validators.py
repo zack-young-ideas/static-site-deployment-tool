@@ -6,6 +6,7 @@ import abc
 import importlib
 import os
 from pathlib import Path
+import sys
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -104,8 +105,14 @@ class Arguments:
             )
 
         # Ensure that the settings defined in settings_file are valid.
-        module_name = os.path.splitext(self.settings_file)[0]
-        mod = importlib.import_module(module_name)
+        module_name = os.path.splitext(os.path.basename(self.settings_file))[0]
+        spec = importlib.util.spec_from_file_location(
+            module_name,
+            self.settings_file
+        )
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = mod
+        spec.loader.exec_module(mod)
         for setting in dir(mod):
             setting_value = getattr(mod, setting)
             setattr(self, setting, setting_value)
