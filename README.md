@@ -28,6 +28,7 @@ Clone the repository:
 ```bash
 git clone http://github.com/zack-young-ideas/static-site-deployment-tool
 cd static-site-deployment-tool
+pip install -r requirements/base.txt
 chmod +x main.py
 ```
 
