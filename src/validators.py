@@ -153,7 +153,7 @@ class Arguments:
                     self._404_FILE
                 )
                 if not os.path.isfile(_404_file_path):
-                     raise ValueError(f'File {_404_file_path} cannot be found')
+                    raise ValueError(f'File {_404_file_path} cannot be found')
 
             # Ensure the 500.html file exists, if specified.
             if self._500_FILE:
